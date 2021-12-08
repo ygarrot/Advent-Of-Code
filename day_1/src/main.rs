@@ -42,7 +42,6 @@ fn exo2<R: BufRead>(reader: &mut R) -> io::Result<()> {
         array[0] = current;
 
         if i > 2 {
-            // println!("{}: {} // {:?}", i, current, array);
             let sum: i32 = array.iter().sum();
 
             if sum > last {
@@ -52,7 +51,7 @@ fn exo2<R: BufRead>(reader: &mut R) -> io::Result<()> {
         }
         array.rotate_right(1);
     }
-    println!("value increased: {}", count);
 
+    println!("value increased: {}", count);
     Ok(())
 }
