@@ -17,11 +17,11 @@ fn main() -> io::Result<()> {
 }
 
 fn exo1<R: BufRead>(reader: &mut R) -> io::Result<()> {
-
     let mut submarine = Submarine::new();
 
     for line in reader.lines() {
         let (s, x) = scan_fmt_some!(&line?, "{} {}", String, i32);
+
         match s.unwrap().as_ref() {
             "forward" => submarine.forward(x.unwrap()),
             "up" => submarine.up(x.unwrap()),
