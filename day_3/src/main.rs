@@ -8,11 +8,8 @@ use bit_reverse::ParallelReverse;
 
 const FILENAME: &str = "./resources/day_3.txt";
 const VEC_SIZE:usize = 12;
-// const FILENAME: &str = "./resources/day_3.txt";
-// const VEC_SIZE:usize = 12;
-fn main() -> io::Result<()> {
-    // const FILENAME: &str = "./resources/day_3.txt";
 
+fn main() -> io::Result<()> {
     let file = File::open(FILENAME)?;
     let mut reader = BufReader::new(file);
 
