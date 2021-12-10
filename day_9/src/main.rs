@@ -2,7 +2,6 @@ use std::fs::File;
 use std::io::{self, prelude::*, BufReader};
 
 const FILENAME: &str = "./resources/day_9.txt";
-// const FILENAME: &str = "./resources/test_2.txt";
 // const FILENAME: &str = "./resources/example.txt";
 
 fn main() -> io::Result<()> {
@@ -16,6 +15,7 @@ fn go_deep(list: &mut Vec<(usize, usize)>,
     board: Vec<Vec<i64>>,
     index: (usize, usize)) -> Vec<(usize, usize)>{
     let COO: Vec<i32> = vec![-1, 0, 1];
+    // let up: Vec<(usize, usize)> = vec![(-1, -1), (-1, 0), (-1, 1)];
     let (c_x, c_y) = index;
 
     for y in COO.clone() {
@@ -56,7 +56,6 @@ fn find_bassin(board: Vec<Vec<i64>>, lowest: Vec<(usize, usize)>) {
         lst.dedup();
         result.push(lst.len());
     }
-
     result.sort();
     println!("{:?}", &result[result.len()-3..].iter().fold(1, |total, x| total * x));
 }
