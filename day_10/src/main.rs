@@ -13,6 +13,13 @@ static BRACK_LIST: Map<char, char> = phf_map! {
     '[' => ']',
 };
 
+static VAL: Map<char, i64> = phf_map! {
+        ')' => 3,
+        ']' => 57,
+        '}' => 1197,
+        '>' => 25137
+};
+
 const FILENAME: &str = "./resources/day_10.txt";
 // const FILENAME: &str = "./resources/example.txt";
 // const FILENAME: &str = "./resources/test_1.txt";
@@ -46,8 +53,6 @@ fn match_b(buf: &String, mut token: Token) -> Token {
     }
     let cur = buf.as_bytes()[token.i];
     token.found = cur as char;
-
-        // println!("{:?}", ret);
     if BRACK_LIST.contains_key(&token.found) {
         let ret = match_b(buf, Token {
             start: token.found,
@@ -76,13 +81,20 @@ fn match_b(buf: &String, mut token: Token) -> Token {
 
 fn exo1<R: BufRead>(reader: &mut R) -> io::Result<()> {
     let mut i = 0;
+    let mut res:i64 = 0;
     for line in reader.lines() {
         let un = line.unwrap();
         let start = &(un.as_bytes()[0] as char);
-        let token =  Token { start: *start, expect: BRACK_LIST[&start], found: ' ', code: ValidationCode::VALID, i: 1};
-        println!("line:{:?} ===========\n\t {:?}", i, un);
-        println!("\t {:?}", match_b(&un, token));
+        let token = Token { start: *start, expect: BRACK_LIST[&start], found: ' ', code: ValidationCode::VALID, i: 1};
+        let result_token = match_b(&un, token);
+        res += match result_token.code {
+            ValidationCode::ERROR => VAL[&result_token.found],
+            ValidationCode::VALID => 0
+        };
+        // println!("line:{:?} ===========\n\t {:?}", i, un);
+        // println!("\t {:?}", );
         i+=1;
     }
+    println!("{:?}", res);
     Ok(())
 }
