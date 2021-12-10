@@ -27,8 +27,8 @@ static COMPLETE_SCORE: Map<char, i64> = phf_map! {
     '>' => 4
 };
 
-// const FILENAME: &str = "./resources/day_10.txt";
-const FILENAME: &str = "./resources/example.txt";
+const FILENAME: &str = "./resources/day_10.txt";
+// const FILENAME: &str = "./resources/example.txt";
 // const FILENAME: &str = "./resources/test_1.txt";
 
 fn main() -> io::Result<()> {
@@ -150,6 +150,10 @@ fn match_b(buf: &String, mut token: Token) -> Token {
     match_b(buf, token)
 }
 
+fn calculate(mat: String) -> i64 {
+    mat.chars().rev().fold(0, |total, x| (total * 5) + COMPLETE_SCORE[&BRACK_LIST[&x]] as i64)
+}
+
 fn exo1<R: BufRead>(reader: &mut R) -> io::Result<()> {
     let mut i = 0;
     let mut res:i64 = 0;
@@ -163,15 +167,15 @@ fn exo1<R: BufRead>(reader: &mut R) -> io::Result<()> {
         let result_token = match_b(&un, token);
         match result_token.code {
             ValidationCode::ERROR => (res += VAL[&result_token.found]),
-            ValidationCode::VALID => {find_match(&mut un)}
+            ValidationCode::VALID => {part_2_res.push(calculate(find_match(&mut un)));continue;}
         };
         // println!("line:{:?} ===========\n\t {:?}", i, un);
         // println!("\t {:?}", result_token);
         i+=1;
     }
     part_2_res.sort();
-    println!("{:?}", part_2_res);
-    // println!("{:?}", part_2_res[part_2_res.len()/2]);
+    // println!("{:?}", part_2_res);
+    println!("{:?}", part_2_res[part_2_res.len()/2]);
 
     println!("{:?}", res);
     Ok(())
