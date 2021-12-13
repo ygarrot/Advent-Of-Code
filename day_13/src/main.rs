@@ -18,8 +18,8 @@ fn main() -> io::Result<()> {
 
 #[derive(Debug, Clone)]
 struct Board {
-    // dot: Vec<i64>,
-    dot: HashMap<(usize, usize), i32>,
+    dot: Vec<(usize, usize)>,
+    // dot: HashMap<(usize, usize), i32>,
     shape: (usize, usize)
 }
 
@@ -27,53 +27,57 @@ struct Board {
 // const Y: usize = 0;
 
 impl Board {
-    fn new (dot: HashMap<(usize, usize), i32>, shape: (usize, usize)) -> Board {
-        Board{
-            dot:dot,
-            shape:shape
+    fn new (dot: Vec<(usize, usize)>, shape: (usize, usize)) -> Board {
+        Board {
+            dot: dot,
+            shape: shape
         }
     }
 
     fn get_char(self, coo: (usize, usize)) -> char {
-        return match self.dot.get(&coo){
+        return match self.dot.into_iter().find(|x| *x == coo){
            Some(_) => '#',
            None => '.'
         }
     }
-    fn display(self) {
+
+    fn vertical_fold(&mut self, fold: usize) {
+        let condition = |x:(usize, usize)| -> bool {x.1 >= fold};
+        let fold = |x:(usize, usize)| -> (usize, usize) {(x.0, fold - (x.1 - fold))};
+        self.dot = self.dot.iter().map(|x| if condition(*x) {fold(*x)} else {*x}).collect();
+    }
+
+    fn display(&self) {
         println!("{:?}", self.shape);
         let map = (0..self.shape.1 + 1).map(|y|
                          (0..self.shape.0 + 1).map(|x| self.clone().get_char((x, y)))
                          .collect::<Vec<char>>()).collect::<Vec<Vec<char>>>();
         for line in map.iter() {
-            println!("{:?}", line);
+            println!("{:?}", line.iter().collect::<String>());
         }
-        // println!("{:?}", map);
     }
 }
 
 fn exo1<R: BufRead>(reader: &mut R) -> io::Result<()> {
-    // let mut coo: Vec<(usize, usize)> = Vec::new();
-    let mut coo = HashMap::new();
+    let mut coo: Vec<(usize, usize)> = Vec::new();
 
     for line in reader.lines() {
         match line {
             Ok(l) => match scan_fmt!(&l, "{},{}", usize, usize) {
-                Ok(x) => {coo.insert(x, 1); continue},
-                // Ok(x) => coo.push(x),
+                Ok(x) => {coo.push(x); continue},
                 _ => println!("invalid input: {:?}", &l)
             },
             _ => ()
         }
     }
     let get_highest = | a: (usize, usize), b: (usize, usize) | -> (usize, usize) { (cmp::max(a.0, b.0), cmp::max(a.1, b.1)) };
-    let highest = coo.iter().fold((0, 0), |total, (k, _)| get_highest(total, *k));
-    // println!("{:?}", highest);
-    println!("{:?}", coo);
-    let t = Board::new(coo, highest);
-    t.display();
-    // println!("{:?}", t);
+    let highest = coo.iter().fold((0, 0), |total, k| get_highest(total, *k));
 
+    // println!("{:?}", coo);
+    let mut t = Board::new(coo, highest);
+    t.display();
+    t.vertical_fold(7);
+    t.display();
 
     Ok(())
 }
