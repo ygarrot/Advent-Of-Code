@@ -1,8 +1,5 @@
-// use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, prelude::*, BufReader};
-
-// use phf::{phf_map};
 use ::phf::{phf_map, Map};
 
 
@@ -52,20 +49,6 @@ struct Token {
     i: usize,
     code: ValidationCode
 }
-
-// gerer le cas end bracket before start
-// fn find_match(buf: &String, mut token: Token, complete: &mut Vec<Token>) -> Token {
-//     if token.found == token.expect {
-//         return token;
-//     }
-//     if BRACK_LIST.contains_key(&token.found) {
-//         match_b(buf, token)
-//     }
-//     while 
-//     token.i += 1;
-//     complete.push(token)
-//     match_b(buf, token)
-// // }
 
 #[derive(Debug, Clone)]
 struct Lowest {
