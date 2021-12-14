@@ -98,7 +98,6 @@ fn exo1<R: BufRead>(reader: &mut R) -> io::Result<()> {
     }
     let highest = t.dot.iter().fold((0, 0), |total, k| get_highest(total, *k));
     t.shape = highest;
-    // t.dot.dedup();
     let mut dedup = Vec::new();
 
     for x in t.dot.iter() {
