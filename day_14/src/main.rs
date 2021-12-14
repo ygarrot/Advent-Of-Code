@@ -6,14 +6,26 @@ use std::collections::HashMap;
 
 #[macro_use] extern crate scan_fmt;
 
-const FILENAME: &str = "./resources/day_14.txt";
-// const FILENAME: &str = "./resources/example.txt";
+// const FILENAME: &str = "./resources/day_14.txt";
+const FILENAME: &str = "./resources/example.txt";
 
 fn main() -> io::Result<()> {
     let mut reader = BufReader::new(File::open(FILENAME)?);
 
     exo1(& mut reader);
     Ok(())
+}
+
+fn create_pair_iterative(buf: & String, rule_insertion: & HashMap<String, char>) -> String {
+    let mut res:String = String::new();
+
+    for i in 0..buf.len() - 1 {
+        let slice = &buf[i..i+2];
+        let (a, b) = (slice.chars().nth(0).unwrap(), slice.chars().nth(1).unwrap());
+        res += &format!("{}{}", a, rule_insertion[slice]).as_str();
+    }
+    res += &buf[buf.len()-1..];
+    res
 }
 
 fn create_pair(buf: & String, rule_insertion: & HashMap<String, char>) -> String {
@@ -28,7 +40,6 @@ fn create_pair(buf: & String, rule_insertion: & HashMap<String, char>) -> String
 
 fn get_result(formula: & String) {
     let mut result: Vec<(usize, char)> = Vec::new();
-
     let mut dedup: Vec<char> = Vec::new();
 
     for x in formula.chars() {
@@ -38,17 +49,15 @@ fn get_result(formula: & String) {
         }
     }
 
-    println!("length: {:?}", dedup);
     for c in dedup {
         result.push((formula.matches(c).count(), c));
     }
     result.sort();
-    // println!("{:?}", result);
     println!("{:?}", result[result.len() - 1].0 - result[0].0);
 }
 
 fn exo1<R: BufRead>(reader: &mut R) -> io::Result<()> {
-    const steps: usize = 40;
+    const steps: usize = 10;
     let mut rule_insertion: HashMap<String, char> = HashMap::new();
     let mut base_formula: String = String::new();
 
@@ -62,10 +71,8 @@ fn exo1<R: BufRead>(reader: &mut R) -> io::Result<()> {
         }
     }
     for i in 0..steps {
-        println!("{:?}", i);
-        base_formula = create_pair(&base_formula, &rule_insertion);
-        // println!("{:?}", base_formula);
-        // get_result(&base_formula);
+        base_formula = create_pair_iterative(&base_formula, &rule_insertion);
+        println!("{:?}: {:?}", i, base_formula);
     }
     get_result(&base_formula);
     Ok(())
