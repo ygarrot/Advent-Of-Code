@@ -1,5 +1,8 @@
+extern crate termion;
+
 use std::fs::File;
 use std::io::{self, prelude::*, BufReader};
+use termion::{color, style};
 
 // struct Pos(usize, usize);
 // struct Adj(i32, i32);
@@ -9,80 +12,115 @@ type Adj = (i32, i32);
 type Neighboors = Vec<Adj>;
 type Positions = Vec<Pos>;
 
-type Board = Vec<Positions>;
+type Line = Vec<i32>;
+type Board = Vec<Line>;
 type Visited = Positions;
 
 fn generate_coo() -> Neighboors {
-    const COO: [i32;3] = [-1, 0, 1];
-
-    let mut res: Neighboors = COO.iter().map(|y| COO.iter().map(|x| (*y, *x)).collect())
-                            .collect::<Vec<Neighboors>>()
-                            .into_iter().flatten().collect::<Neighboors>();
-    res.remove(4);
-    res
+    return vec![(0, 1), (1, 0)];
 }
-// const FILENAME: &str = "./resources/day_15.txt";
-const FILENAME: &str = "./resources/example.txt";
+
+const FILENAME: &str = "./resources/day_15.txt";
+// const FILENAME: &str = "./resources/example.txt";
 
 // struct Board {
 // }
 
-fn walk(board: & Board, visited: &mut Visited, pos: Pos) -> i64 {
-    let mut lowest = i64::MAX;
-    let neighboors = generate_coo();
-
-    // let add = |x: (i32, i32), y: (i32, i32)| (x.0 + y.0, x.1 + y.1);
-
-    visited.push(pos);
-    for neighboor in neighboors {
-        let next_coo = ((pos.0 as i32 + neighboor.0) as usize, (pos.1 as i32 + neighboor.1) as usize);
-        // let next_coo = add(pos as (i32, i32), neighboor) as (usize, usize);
-        let (x, y) = next_coo;
-        let next = board[y][x];
-        if !visited.contains(&(x, y)) {
-            lowest = i64::min(lowest, walk(board, visited, next))
+fn display(board: &Board, visited: &Visited, pos: Pos) {
+    println!("=================================");
+    for y in 0..board.len() {
+        for x in 0..board[0].len() {
+            if visited.contains(&(x, y)){ 
+                    print!("{}", color::Fg(color::Red));
+            }
+            if (x, y) == pos{ 
+                    print!("{}", color::Fg(color::Blue));
+            }
+            print!(".{}", color::Fg(color::White));
+            // print!(".{}", termion::clear::All);
         }
+        println!();
     }
-    lowest
+    println!("=================================");
 }
 
-// struct Room<'a> {
-//     weight: i64,
-//     neighboor: Vec<&'a Room<'a>>
-// }
+fn walk(board: & Board, visited: & Visited, pos: Pos) -> i32 {
+    let mut lowest = i32::MAX;
+    let res = board[pos.0][pos.1];
+    let neighboors = generate_coo();
 
-// impl <'a> Room<'a> {
-//     fn new() {
-//     }
+    let mut past_visited = visited.clone();
 
-//     fn walk(self) -> i64 {
-//         let mut lowest = i64::MAX;
+    // display(board, visited, pos);
+    past_visited.push(pos);
+    if (pos.0 == board.len() -1 && pos.1 == board[0].len()-1) {
+        return res;
+    }
+    for neighboor in neighboors.clone() {
+        let next_coo = ((pos.0 as i32 + neighboor.0), (pos.1 as i32 + neighboor.1));
+        let (x, y) = next_coo;
+        if  y < 0 || y >= board.len() as i32 || x < 0 || x >= board[0].len() as i32 {
+            continue;
+        }
+        let (x, y) = (x as usize, y as usize);
+        if !visited.contains(&(x, y)) {
+            past_visited.push((x, y));
+        }
+    }
 
-//         for n in self.neighboor {
-//             let current = n.walk();
-//             lowest = i64::max(current, lowest);
-//         }
-//         lowest
-//     }
-// }
+    for neighboor in neighboors {
+        let next_coo = ((pos.0 as i32 + neighboor.0), (pos.1 as i32 + neighboor.1));
+        let (x, y) = next_coo;
+
+        if  y < 0 || y >= board.len() as i32 || x < 0 || x >= board[0].len() as i32 {
+            continue;
+        }
+        let (x, y) = (x as usize, y as usize);
+
+        if !visited.contains(&(x, y)) {
+            // past_visited.push((x, y));
+            // println!("{:?}", past_visited);
+            // println!("{:?}", past_visited.len());
+            // println!("{:?} => {:?}", pos, next_coo);
+            lowest = i32::min(lowest, walk(board, &past_visited, (x, y)));
+        }
+    }
+    if (lowest == i32::MAX) {
+        return res;
+    }
+
+    res + lowest
+}
 
 fn main() -> io::Result<()> {
     let mut reader = BufReader::new(File::open(FILENAME)?);
 
-    exo1(& mut reader);
+    part1(& mut reader);
     Ok(())
 }
 
-fn exo1<R: BufRead>(reader: &mut R) -> io::Result<i64> {
+fn part1<R: BufRead>(reader: &mut R) -> io::Result<i32> {
+    let mut board: Board = Vec::new();
     for line in reader.lines() {
-
+        let current: Line = line.unwrap()
+            .chars()
+            .map(|c| c.to_digit(10).unwrap() as i32)
+            .collect();
+        board.push(current);
     }
+    let res = walk(&board, &mut Vec::new(), (0, 0));
+    println!("{:?}", res);
     Ok(40)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // #[test]
+    // fn test_init() {
+    //     assert_eq!(final_coo, part1());
+    // }
 
     #[test]
     fn test_coo() {
@@ -97,7 +135,7 @@ mod tests {
     #[test]
     fn example() {
         let mut reader = BufReader::new(File::open(FILENAME).unwrap());
-        let result = exo1(& mut reader);
+        let result = part1(& mut reader);
         assert_eq!(result.unwrap(), 40);
     }
 }

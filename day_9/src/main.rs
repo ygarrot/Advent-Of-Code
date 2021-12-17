@@ -1,8 +1,8 @@
 use std::fs::File;
 use std::io::{self, prelude::*, BufReader};
 
-const FILENAME: &str = "./resources/day_9.txt";
-// const FILENAME: &str = "./resources/example.txt";
+// const FILENAME: &str = "./resources/day_9.txt";
+const FILENAME: &str = "./resources/example.txt";
 
 fn main() -> io::Result<()> {
     let mut reader = BufReader::new(File::open(FILENAME)?);
@@ -64,17 +64,6 @@ fn is_lower(board: Vec<Vec<i64>>, index: (usize, usize)) -> bool {
     let coo: [i32;3] = [-1, 0, 1];
 
     let (c_x, c_y) = index;
-    // let ox = c_x + x;
-    // let oy = c_y + y;
-    // if oy < 0 {
-    //     return is_lower(board, index, x, y + 1)
-    // }
-    // if oy >= board.len() as i32 {
-    //     return is_lower(board, index, x + 1, -1)
-    // }
-    // if (x != 0 && y != 0) || (x == 0 && y == 0){ 
-    // }
-    // true
     for y in coo {
         let oy = c_y  as i32 + y;
 
@@ -140,7 +129,6 @@ fn exo1<R: BufRead>(reader: &mut R) -> io::Result<()> {
     let lowest = find_lowest_coo(total.clone());
     println!("{:?}", lowest);
     find_bassin(total, lowest);
-
 
     Ok(())
 }
