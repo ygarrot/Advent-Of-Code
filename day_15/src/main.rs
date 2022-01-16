@@ -51,7 +51,7 @@ fn walk(board: & Board, visited: & Visited, pos: Pos) -> i32 {
 
     let mut past_visited = visited.clone();
 
-    // display(board, visited, pos);
+    display(board, visited, pos);
     past_visited.push(pos);
     if (pos.0 == board.len() -1 && pos.1 == board[0].len()-1) {
         return res;
